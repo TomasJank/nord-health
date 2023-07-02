@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { useField } from '@/composables';
 import validators from '@/services/validationService';
@@ -38,11 +38,14 @@ const handleSubmit = async () => {
     username.focus();
   }
 };
+watch([() => password.value, () => username.value], () => {
+  backendErrorMessage.value = '';
+});
 </script>
 
 <template>
   <div class="login-page">
-    <div class="content-wrapper">
+    <nord-stack class="content-wrapper">
       <nord-card class="mb-3" padding="l">
         <h2 slot="header" class="text-center">Sign in to Nord Health</h2>
         <form action="#" @submit.prevent="handleSubmit">
@@ -56,8 +59,9 @@ const handleSubmit = async () => {
               placeholder="user@example.com"
               :error="username.error"
               @input="username.value = $event.target.value"
-            />
-
+            >
+              <span v-if="backendErrorMessage" slot="error" />
+            </nord-input>
             <div class="password">
               <nord-input
                 :ref="password.setRef"
@@ -66,13 +70,9 @@ const handleSubmit = async () => {
                 type="password"
                 name="password"
                 placeholder="••••••••"
-                :error="password.error"
+                :error="password.error || backendErrorMessage"
                 @input="password.value = $event.target.value"
               />
-            </div>
-
-            <div v-if="backendErrorMessage">
-              {{ backendErrorMessage }}
             </div>
 
             <nord-button :loading="isLoading" type="submit" expand variant="primary">Sign in</nord-button>
@@ -84,7 +84,7 @@ const handleSubmit = async () => {
         New to Nord?
         <router-link :to="Route.Register">Create an account</router-link>
       </nord-card>
-    </div>
+    </nord-stack>
   </div>
 </template>
 
@@ -94,6 +94,7 @@ const handleSubmit = async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 24px;
   height: 100vh;
   background-color: var(--primary);
 }

@@ -1,3 +1,4 @@
 export const Errors = {
-  EMAIL_NOT_FOUND: 'Wrong email or password'
+  ['auth/user-not-found']: 'Invalid username or password',
+  ['auth/email-already-in-use']: 'Email already in use'
 };

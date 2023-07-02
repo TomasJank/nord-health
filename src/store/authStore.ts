@@ -1,7 +1,8 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, AuthError, FireB } from 'firebase/auth';
 import { defineStore } from 'pinia';
 import { reactive } from 'vue';
 import router from '@/router';
+import { Errors } from '@/types/enums/errorEnums';
 import { Route } from '@/types/enums/routeEnums';
 import { StoreName } from '@/types/enums/storeEnums';
 import { User, AuthParams } from '@/types/models/authModels';
@@ -12,11 +13,10 @@ export const useAuthStore = defineStore(
     const auth = getAuth();
 
     const register = async ({ email, password }: AuthParams) => {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
-      if (response) {
-        console.log('response', response);
-      } else {
-        throw new Error('Unable to register user');
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } catch (error: any) {
+        throw new Error(Errors[error.code as keyof typeof Errors]);
       }
     };
 
@@ -24,8 +24,8 @@ export const useAuthStore = defineStore(
       try {
         const { user } = await signInWithEmailAndPassword(auth, email, password);
         currentUser.email = user.email;
-      } catch (error) {
-        throw new Error('Failed to login');
+      } catch (error: any) {
+        throw new Error(Errors[error.code as keyof typeof Errors]);
       }
     };
 

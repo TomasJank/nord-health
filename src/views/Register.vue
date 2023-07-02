@@ -9,6 +9,7 @@ import { Route } from '@/types/enums/routeEnums';
 const authStore = useAuthStore();
 const router = useRouter();
 const isLoading = ref(false);
+const backendErrorMessage = ref('');
 
 const username = useField(validators.email);
 const password = useField(validators.password);
@@ -20,8 +21,8 @@ const handleSubmit = async () => {
       isLoading.value = true;
       await authStore.register({ email: username.value, password: password.value });
       router.push({ name: Route.Login });
-    } catch (e) {
-      console.log(e);
+    } catch (error: any) {
+      backendErrorMessage.value = error.message;
     }
     isLoading.value = false;
   }
@@ -31,7 +32,6 @@ const handleSubmit = async () => {
     password.focus();
   }
 
-  console.log('isPasswordMatch', repeatPassword, password.isValid);
   if (!repeatPassword.isValid && password.isValid) {
     repeatPassword.error = repeatPassword.validationMessage;
     repeatPassword.focus();
@@ -43,6 +43,10 @@ const handleSubmit = async () => {
   }
 };
 
+watch([() => password.value, () => username.value, () => repeatPassword.value], () => {
+  backendErrorMessage.value = '';
+});
+
 watch(password, (value) => {
   repeatPassword.additionalValue = value.value;
 });
@@ -50,7 +54,7 @@ watch(password, (value) => {
 
 <template>
   <div class="signup-page">
-    <div class="content-wrapper">
+    <nord-stack class="content-wrapper">
       <nord-card class="mb-3" padding="l">
         <h2 slot="header" class="text-center">Create a Nord Health account</h2>
         <form action="#" @submit.prevent="handleSubmit">
@@ -64,7 +68,9 @@ watch(password, (value) => {
               placeholder="user@example.com"
               :error="username.error"
               @input="username.value = $event.target.value"
-            />
+            >
+              <span v-if="backendErrorMessage" slot="error" />
+            </nord-input>
 
             <div class="password">
               <nord-input
@@ -76,7 +82,9 @@ watch(password, (value) => {
                 placeholder="••••••••"
                 :error="password.error"
                 @input="password.value = $event.target.value"
-              />
+              >
+                <span v-if="backendErrorMessage" slot="error" />
+              </nord-input>
             </div>
 
             <div class="repeat-password">
@@ -87,7 +95,7 @@ watch(password, (value) => {
                 type="password"
                 name="repeat-password"
                 placeholder="••••••••"
-                :error="repeatPassword.error"
+                :error="repeatPassword.error || backendErrorMessage"
                 @input="repeatPassword.value = $event.target.value"
               />
             </div>
@@ -101,12 +109,13 @@ watch(password, (value) => {
         Already a member?
         <router-link :to="Route.Login">Log in</router-link>
       </nord-card>
-    </div>
+    </nord-stack>
   </div>
 </template>
 
 <style scoped>
 .signup-page {
+  padding: 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
