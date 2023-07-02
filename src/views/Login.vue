@@ -22,7 +22,7 @@ const handleSubmit = async () => {
       isLoading.value = true;
       await authStore.logIn({ email: username.value, password: password.value });
       router.push({ name: Route.Dashboard });
-    } catch (error: { message: string }) {
+    } catch (error: any) {
       backendErrorMessage.value = error.message;
     }
     isLoading.value = false;
