@@ -26,7 +26,10 @@ getAuth().onAuthStateChanged((user) => {
           <h2 slot="header">Welcome {{ authStore.currentUser.email }}</h2>
           <nord-stack direction="horizontal">
             <nord-stack gap="l">
-              <p>Welcome to nord health dashboard</p>
+              <p>
+                Welcome to
+                <strong>Nord Health dashboard</strong>
+              </p>
             </nord-stack>
           </nord-stack>
         </nord-card>

@@ -99,7 +99,7 @@ watch([() => password.value, () => username.value], () => {
   background-color: var(--primary);
 }
 .content-wrapper {
-  width: 500px;
+  width: 400px;
 }
 .password {
   position: relative;
